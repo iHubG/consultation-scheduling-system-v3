@@ -2,31 +2,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
+import { Skeleton } from '@/components/ui/skeleton';
 import { type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 
 import { Activity, BookOpen, ClipboardList, Clock, Download, LayoutDashboard, Settings, TrendingUp, UserPlus, Users } from 'lucide-react';
 
 export default function AdminDashboard() {
-    const { auth } = usePage<SharedData>().props;
-
-    const systemStats = {
-        totalUsers: 252,
-        students: 202,
-        faculty: 50,
-        activeConsultations: 12,
-        completedToday: 8,
-        pendingRequests: 5,
-        systemUptime: 99.9,
-        monthlyGrowth: 12.5,
-    };
-
-    const recentActivity = [
-        { id: 1, action: 'New student registration', user: 'John Doe', time: '2 min ago', type: 'user' },
-        { id: 2, action: 'Consultation completed', user: 'Dr. Smith', time: '15 min ago', type: 'consultation' },
-        { id: 3, action: 'System settings updated', user: 'Admin', time: '1 hour ago', type: 'system' },
-        { id: 4, action: 'New consultation area created', user: 'Admin', time: '2 hours ago', type: 'area' },
-    ];
+    const { auth, systemStats, recentActivity } = usePage<SharedData>().props;
 
     const getActivityIcon = (type: string) => {
         const icons: Record<string, JSX.Element> = {
@@ -37,6 +20,37 @@ export default function AdminDashboard() {
         };
         return icons[type] ?? <Activity className="h-4 w-4 text-gray-500" />;
     };
+
+    if (!systemStats || !recentActivity) {
+        return (
+            <div className="space-y-6 p-6">
+                {/* Header Skeleton */}
+                <Skeleton className="h-8 w-1/3" />
+                <Skeleton className="h-4 w-1/2" />
+
+                {/* Stats Cards Skeleton */}
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    {[...Array(4)].map((_, i) => (
+                        <Skeleton key={i} className="h-28 rounded-md" />
+                    ))}
+                </div>
+
+                {/* Main Section Skeleton */}
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+                    <div className="space-y-4 lg:col-span-2">
+                        {[...Array(4)].map((_, i) => (
+                            <Skeleton key={i} className="h-12 rounded-md" />
+                        ))}
+                    </div>
+                    <div className="space-y-4">
+                        {[...Array(6)].map((_, i) => (
+                            <Skeleton key={i} className="h-8 rounded-md" />
+                        ))}
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen space-y-6 bg-gray-50 p-6 dark:bg-gray-900">
@@ -131,12 +145,10 @@ export default function AdminDashboard() {
                 <div className="lg:col-span-2">
                     <Card className="border-0 shadow-sm">
                         <CardHeader className="pb-4">
-                            <div className="flex items-center justify-between">
-                                <CardTitle className="flex items-center gap-2 text-lg font-semibold">
-                                    <LayoutDashboard className="h-5 w-5" />
-                                    Quick Actions
-                                </CardTitle>
-                            </div>
+                            <CardTitle className="flex items-center gap-2 text-lg font-semibold">
+                                <LayoutDashboard className="h-5 w-5" />
+                                Quick Actions
+                            </CardTitle>
                         </CardHeader>
                         <CardContent className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                             {[

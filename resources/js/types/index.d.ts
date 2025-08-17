@@ -28,6 +28,8 @@ export interface SharedData {
     auth: Auth;
     ziggy: Config & { location: string };
     sidebarOpen: boolean;
+    systemStats?: SystemStats;
+    recentActivity?: ActivityItem[];
     [key: string]: unknown;
 }
 
@@ -39,7 +41,27 @@ export interface User {
     email_verified_at: string | null;
     created_at: string;
     updated_at: string;
-    [key: string]: unknown; // This allows for additional properties...
     roles: string[];        
     permissions: string[]; 
+    [key: string]: unknown; // This allows for additional properties...
 }
+
+export interface SystemStats {
+    totalUsers: number;
+    students: number;
+    faculty: number;
+    activeConsultations: number;
+    completedToday: number;
+    pendingRequests: number;
+    systemUptime: number;
+    monthlyGrowth: number;
+}
+
+export interface ActivityItem {
+    id: number;
+    action: string;
+    user: string;
+    time: string;
+    type: string;
+}
+
