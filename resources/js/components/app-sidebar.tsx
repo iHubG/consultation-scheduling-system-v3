@@ -38,17 +38,18 @@ export function AppSidebar() {
             roles: 'admin',
         },
         {
-            title: 'System Settings',
-            href: '/admin',
-            icon: Settings,
-            roles: 'admin',
-        },
-        {
             title: 'All Consultations',
             href: '/consultations',
             icon: ClipboardList,
             roles: 'admin',
         },
+        {
+            title: 'System Settings',
+            href: '/admin',
+            icon: Settings,
+            roles: 'admin',
+        },
+        
 
         // Faculty only
         {

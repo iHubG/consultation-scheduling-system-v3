@@ -31,6 +31,15 @@ class AuthenticatedSessionController extends Controller
     {
         $request->authenticate();
 
+        // Check if the authenticated user is inactive
+        if (Auth::user()->status !== 'active') {
+            Auth::logout();
+
+            return back()->withErrors([
+                'approval' => 'Your account is not active yet. Please wait for admin approval.',
+            ]);
+        }
+
         $request->session()->regenerate();
 
         return redirect()->intended(route('dashboard', absolute: false));

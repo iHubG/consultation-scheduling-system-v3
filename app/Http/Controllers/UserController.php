@@ -92,6 +92,7 @@ class UserController extends Controller
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
+                'status' => $user->status,
                 'roles' => $user->roles->pluck('name'),
                 'permissions' => $user->permissions->pluck('name'),
             ],
@@ -111,11 +112,13 @@ class UserController extends Controller
             'password' => 'nullable|min:6|confirmed',
             'roles' => 'array',
             'permissions' => 'array',
+            'status' => 'required|in:active,inactive',
         ]);
 
         $user->update([
             'name' => $data['name'],
             'email' => $data['email'],
+            'status' => $data['status'],
             ...(isset($data['password']) && $data['password']
                 ? ['password' => bcrypt($data['password'])]
                 : []),

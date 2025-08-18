@@ -6,6 +6,7 @@ export default function Edit() {
             id: number;
             name: string;
             email: string;
+            status: string; // ✅ Add status to the type
             roles: string[];
             permissions: string[];
         };
@@ -18,6 +19,7 @@ export default function Edit() {
     const { data, setData, put, processing, errors } = useForm({
         name: user.name || '',
         email: user.email || '',
+        status: user.status || 'inactive', // ✅ Add to form data
         password: '',
         password_confirmation: '',
         roles: user.roles || [],
@@ -30,9 +32,12 @@ export default function Edit() {
     }
 
     function toggleArrayValue(field: 'roles' | 'permissions', value: string) {
-        setData(field, data[field].includes(value)
-            ? data[field].filter(v => v !== value)
-            : [...data[field], value]);
+        setData(
+            field,
+            data[field].includes(value)
+                ? data[field].filter(v => v !== value)
+                : [...data[field], value]
+        );
     }
 
     return (
@@ -59,6 +64,19 @@ export default function Edit() {
                         className="border w-full p-2"
                     />
                     {errors.email && <div className="text-red-500">{errors.email}</div>}
+                </div>
+
+                <div>
+                    <label>Status</label>
+                    <select
+                        value={data.status}
+                        onChange={e => setData('status', e.target.value)}
+                        className="border w-full p-2"
+                    >
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                    {errors.status && <div className="text-red-500">{errors.status}</div>}
                 </div>
 
                 <div>
