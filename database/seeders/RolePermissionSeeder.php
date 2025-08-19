@@ -13,10 +13,17 @@ class RolePermissionSeeder extends Seeder
     {
         // Permissions
         $permissions = [
+            // User permissions
             'user.view',
             'user.create',
             'user.edit',
-            'user.delete'
+            'user.delete',
+
+            // Role & Permission management
+            'role.view',
+            'role.create',
+            'role.edit',
+            'role.delete',
         ];
 
         foreach ($permissions as $permission) {
@@ -29,9 +36,9 @@ class RolePermissionSeeder extends Seeder
         $student = Role::firstOrCreate(['name' => 'student']);
 
         // Assign permissions to roles
-        $admin->syncPermissions($permissions);
-        $faculty->syncPermissions(['user.view', 'user.edit']);
-        $student->syncPermissions(['user.view']);
+        $admin->syncPermissions($permissions); // Admin gets all permissions
+        $faculty->syncPermissions(['user.view', 'user.edit']); // Faculty limited to user view/edit
+        $student->syncPermissions(['user.view']); // Student only user view
 
         // Create sample users
         $adminUser = User::firstOrCreate(

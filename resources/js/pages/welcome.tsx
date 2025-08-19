@@ -1,6 +1,7 @@
 import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { CalendarCheck } from 'lucide-react';
+import DashboardPreview from '../../assets/images/dashboard.png'
 
 export default function Welcome() {
     const { auth } = usePage<SharedData>().props;
@@ -75,13 +76,11 @@ export default function Welcome() {
                         {/* Right Image / Graphic Area */}
                         <div className="relative -mb-px aspect-[335/376] w-full shrink-0 overflow-hidden rounded-b-lg bg-[#fff2f2] lg:mb-0 lg:-ml-px lg:aspect-auto lg:w-[438px] lg:rounded-t-none lg:rounded-r-lg lg:rounded-bl-none dark:bg-[#1D0002]">
                             <div className="absolute inset-0 rounded-b-lg shadow-[inset_0px_0px_0px_1px_rgba(26,26,0,0.16)] lg:rounded-t-none lg:rounded-r-lg lg:rounded-bl-none dark:shadow-[inset_0px_0px_0px_1px_#fffaed2d]" />
-                            {/* Optional image:
                             <img 
-                                src="/images/consultation-screenshot.png" 
+                                src={DashboardPreview}
                                 alt="Consultation Scheduling System" 
-                                className="absolute inset-0 h-full w-full object-cover opacity-90" 
-                            /> 
-                            */}
+                                className="absolute inset-0 h-full w-full object-contain opacity-90" 
+                            />                  
                         </div>
                     </main>
                 </div>

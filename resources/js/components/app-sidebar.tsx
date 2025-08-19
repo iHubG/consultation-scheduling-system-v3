@@ -5,7 +5,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import useCan from '@/hooks/useCan';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { LayoutGrid, Shield, User, Settings, Clock, ClipboardList } from 'lucide-react';
+import { LayoutGrid, Shield, User, Settings, Clock, ClipboardList, University } from 'lucide-react';
 import AppLogo from './app-logo';
 
 type PermissionNavItem = NavItem & {
@@ -41,6 +41,12 @@ export function AppSidebar() {
             title: 'All Consultations',
             href: '/consultations',
             icon: ClipboardList,
+            roles: 'admin',
+        },
+         {
+            title: 'Consultation Areas',
+            href: '/consultation-areas',
+            icon: University,
             roles: 'admin',
         },
         {
