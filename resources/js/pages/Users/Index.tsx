@@ -1,94 +1,121 @@
-import { Link, usePage, router } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
+import { useEffect } from 'react';
+import { toast } from 'sonner';
+
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+
 import useCan from '@/hooks/useCan';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
+import Pagination from '@/components/Pagination'; 
+import { type BreadcrumbItem, type Paginated, type User } from '@/types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Users',
-        href: '/users',
-    },
+  {
+    title: 'Users',
+    href: '/users',
+  },
 ];
 
+type PageProps = {
+  users: Paginated<User>;
+  flash?: {
+    success?: string;
+    error?: string;
+  };
+};
+
 export default function Index() {
-    type User = {
-        id: number;
-        name: string;
-        email: string;
-        roles: string[];
-        permissions: string[];
-    };
+  const { users, flash } = usePage<PageProps>().props;
+  const { can } = useCan();
 
-    type PageProps = {
-        users: {
-            data: User[];
-        };
-    };
+  useEffect(() => {
+    if (flash?.success) toast.success(flash.success);
+    if (flash?.error) toast.error(flash.error);
+  }, [flash]);
 
-    const { users } = usePage<PageProps>().props;
-    const { can } = useCan();
-
-    function deleteUser(id: number) {
-        if (confirm('Are you sure you want to delete this user?')) {
-            router.delete(`/users/${id}`);
-        }
+  const deleteUser = (id: number) => {
+    if (confirm('Are you sure you want to delete this user?')) {
+      router.delete(`/users/${id}`);
     }
+  };
+console.log(users);
 
-    return (
-        <AppLayout breadcrumbs={breadcrumbs}>
-        <div className="p-6">
-            <div className="flex justify-between items-center mb-4">
-                <h1 className="text-xl font-bold">Users</h1>
-                {can('user.create') && (
-                    <Link
-                        href="/users/create"
-                        className="px-4 py-2 bg-blue-600 text-white rounded"
-                    >
-                        Create User
-                    </Link>
-                )}
-            </div>
+  return (
+    <AppLayout breadcrumbs={breadcrumbs}>
+      <Card className="mx-auto mt-6 w-full">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0">
+          <CardTitle className="text-xl">Users</CardTitle>
+          {can('user.create') && (
+            <Link href="/users/create">
+              <Button variant="default" size="icon" aria-label="Create User">
+                <Plus className="h-4 w-4" />
+              </Button>
+            </Link>
+          )}
+        </CardHeader>
 
-            <table className="w-full border-collapse border">
-                <thead>
-                    <tr>
-                        <th className="border px-4 py-2">Name</th>
-                        <th className="border px-4 py-2">Email</th>
-                        <th className="border px-4 py-2">Roles</th>
-                        <th className="border px-4 py-2">Permissions</th>
-                        <th className="border px-4 py-2">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {users.data.map((user: User) => (
-                        <tr key={user.id}>
-                            <td className="border px-4 py-2">{user.name}</td>
-                            <td className="border px-4 py-2">{user.email}</td>
-                            <td className="border px-4 py-2">{user.roles.join(', ')}</td>
-                            <td className="border px-4 py-2">{user.permissions.join(', ')}</td>
-                            <td className="border px-4 py-2 space-x-2">
-                                {can('user.edit') && (
-                                    <Link
-                                        href={`/users/${user.id}/edit`}
-                                        className="px-2 py-1 bg-yellow-500 text-white rounded"
-                                    >
-                                        Edit
-                                    </Link>
-                                )}
-                                {can('user.delete') && (
-                                    <button
-                                        onClick={() => deleteUser(user.id)}
-                                        className="px-2 py-1 bg-red-600 text-white rounded"
-                                    >
-                                        Delete
-                                    </button>
-                                )}
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
-        </AppLayout>
-    );
+        <CardContent className="overflow-x-auto">
+          <Table className="w-full text-sm">
+            <TableHeader>
+              <TableRow>
+                <TableHead>Id</TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Roles</TableHead>
+                <TableHead>Permissions</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {users.data.map((user) => (
+                <TableRow key={user.id}>
+                  <TableCell className="font-medium">{user.id}</TableCell>
+                  <TableCell className="font-medium">{user.name}</TableCell>
+                  <TableCell>{user.email}</TableCell>
+                  <TableCell>{user.roles?.join(', ') ?? ''}</TableCell>
+                  <TableCell className="break-words whitespace-normal text-muted-foreground">
+                    {user.permissions?.join(', ') ?? ''}
+                  </TableCell>
+
+                  <TableCell className="space-x-2 text-right">
+                    {can('user.edit') && (
+                      <Link href={`/users/${user.id}/edit`}>
+                        <Button
+                          variant="blue"
+                          size="icon"
+                          className="h-8 w-8"
+                          aria-label="Edit"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                      </Link>
+                    )}
+                    {can('user.delete') && (
+                      <Button
+                        variant="destructive"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => deleteUser(user.id)}
+                        aria-label="Delete"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+
+          {/* ✅ Plug in your reusable pagination component here */}
+          <div className="mt-6">
+            <Pagination data={users} />
+          </div>
+        </CardContent>
+      </Card>
+    </AppLayout>
+  );
 }

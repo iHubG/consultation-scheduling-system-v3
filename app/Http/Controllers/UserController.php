@@ -6,84 +6,91 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Http\Controllers\Controller;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('permission:user.view')->only(['index', 'show']);
-        $this->middleware('permission:user.create')->only(['create', 'store']);
-        $this->middleware('permission:user.edit')->only(['edit', 'update']);
-        $this->middleware('permission:user.delete')->only(['destroy']);
-    }
+ public function index()
+{
+    $paginator = User::with('roles', 'permissions')
+        ->oldest()
+        ->paginate(10);
 
-    /**
-     * Display a list of users
-     */
-    public function index()
-    {
-        $users = User::latest()
-            ->paginate(10)
-            ->through(fn ($user) => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'status' => $user->status,
-            ]);
+    // Apply the transformation to only the data
+    $transformed = $paginator->getCollection()->map(fn($user) => [
+        'id' => $user->id,
+        'name' => $user->name,
+        'email' => $user->email,
+        'status' => $user->status,
+        'roles' => $user->getRoleNames()->toArray(),
+        'permissions' => $user->getAllPermissions()->pluck('name')->toArray(),
+    ]);
 
-        return Inertia::render('Users/Index', [
-            'users' => $users,
+    // Replace the original data with transformed data
+    $paginator->setCollection($transformed);
+
+    return Inertia::render('users/Index', [
+        'users' => $paginator,
+    ]);
+}
+
+
+    public function create()
+    {
+        return Inertia::render('users/Create', [
+            'roles' => Role::pluck('name'),
+            'permissions' => Permission::pluck('name'),
         ]);
     }
 
-    /**
-     * Show create form
-     */
-    public function create()
-    {
-        return Inertia::render('Users/Create');
-    }
 
-    /**
-     * Store new user
-     */
     public function store(Request $request)
     {
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users',
-            'password' => 'required|min:6|confirmed',
-            'status' => 'required|in:active,inactive',
+            'password' => 'required|min:8|confirmed',
+            'status' => 'in:active,inactive',
+            'roles' => 'array',
+            'permissions' => 'array',
         ]);
 
-        User::create([
+        $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
-            'password' => bcrypt($data['password']),
-            'status' => $data['status'],
+            'password' => Hash::make($data['password']),
+            'status' => $data['status'] ?? 'active',
         ]);
+
+        if (!empty($data['roles'])) {
+            $user->syncRoles($data['roles']);
+        }
+
+        if (!empty($data['permissions'])) {
+            $user->syncPermissions($data['permissions']);
+        }
 
         return redirect()->route('users.index')->with('success', 'User created.');
     }
 
-    /**
-     * Show edit form
-     */
     public function edit(User $user)
     {
-        return Inertia::render('Users/Edit', [
+        return Inertia::render('users/Edit', [
             'user' => [
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
                 'status' => $user->status,
+                'roles' => $user->roles->pluck('name'),
+                'permissions' => $user->permissions->pluck('name'),
             ],
+            'roles' => Role::pluck('name'),
+            'permissions' => Permission::pluck('name'),
         ]);
     }
 
-    /**
-     * Update user
-     */
     public function update(Request $request, User $user)
     {
         $data = $request->validate([
@@ -91,6 +98,8 @@ class UserController extends Controller
             'email' => 'required|email|unique:users,email,' . $user->id,
             'password' => 'nullable|min:6|confirmed',
             'status' => 'required|in:active,inactive',
+            'roles' => 'array',
+            'permissions' => 'array',
         ]);
 
         $user->update([
@@ -100,12 +109,17 @@ class UserController extends Controller
             ...(isset($data['password']) && $data['password'] ? ['password' => bcrypt($data['password'])] : []),
         ]);
 
+        if (isset($data['roles'])) {
+            $user->syncRoles($data['roles']);
+        }
+
+        if (isset($data['permissions'])) {
+            $user->syncPermissions($data['permissions']);
+        }
+
         return redirect()->route('users.index')->with('success', 'User updated.');
     }
 
-    /**
-     * Delete user
-     */
     public function destroy(User $user)
     {
         $user->delete();

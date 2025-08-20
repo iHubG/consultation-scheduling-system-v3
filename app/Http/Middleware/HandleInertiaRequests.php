@@ -24,32 +24,37 @@ class HandleInertiaRequests extends Middleware
             ...parent::share($request),
             'name' => config('app.name'),
             'quote' => [
-                'message' => trim($message), 
+                'message' => trim($message),
                 'author' => trim($author)
+            ],
+
+            'flash' => [
+                'success' => fn() => $request->session()->get('success'),
+                'error' => fn() => $request->session()->get('error'),
             ],
 
             // ✅ Pass auth user info with roles & permissions
             'auth' => [
-                'user' => fn () => $request->user()
+                'user' => fn() => $request->user()
                     ? [
                         'id' => $request->user()->id,
                         'name' => $request->user()->name,
                         'email' => $request->user()->email,
-                        'roles' => $request->user()->getRoleNames(), // e.g. ["admin"]
-                        'permissions' => $request->user()->getAllPermissions()->pluck('name'), // e.g. ["user.view", "user.create"]
+                        'roles' => $request->user()->getRoleNames()->values()->all(),
+                        'permissions' => $request->user()->getAllPermissions()->pluck('name')->values()->all(),
                     ]
                     : null,
             ],
 
             // Ziggy routes
-            'ziggy' => fn (): array => [
+            'ziggy' => fn(): array => [
                 ...(new Ziggy)->toArray(),
                 'location' => $request->url(),
             ],
 
             // Sidebar state
-            'sidebarOpen' => 
-                ! $request->hasCookie('sidebar_state') || 
+            'sidebarOpen' =>
+            ! $request->hasCookie('sidebar_state') ||
                 $request->cookie('sidebar_state') === 'true',
         ];
     }

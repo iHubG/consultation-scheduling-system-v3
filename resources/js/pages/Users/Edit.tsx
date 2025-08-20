@@ -1,149 +1,186 @@
-import { useForm, Link, usePage } from '@inertiajs/react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-export default function Edit() {
-    type PageProps = {
-        user: {
-            id: number;
-            name: string;
-            email: string;
-            status: string; // ✅ Add status to the type
-            roles: string[];
-            permissions: string[];
-        };
+import AppLayout from '@/layouts/app-layout';
+import { Link, useForm, usePage } from '@inertiajs/react';
+
+type PageProps = {
+    user: {
+        id: number;
+        name: string;
+        email: string;
+        status: string;
         roles: string[];
         permissions: string[];
     };
+    roles: string[];
+    permissions: string[];
+};
 
+const breadcrumbs = [
+    { title: 'Users', href: '/users' },
+    { title: 'Edit', href: '#' },
+];
+
+export default function Edit() {
     const { user, roles, permissions } = usePage<PageProps>().props;
 
-    const { data, setData, put, processing, errors } = useForm({
+    const form = useForm({
         name: user.name || '',
         email: user.email || '',
-        status: user.status || 'inactive', // ✅ Add to form data
+        status: user.status || 'inactive',
         password: '',
         password_confirmation: '',
         roles: user.roles || [],
         permissions: user.permissions || [],
     });
 
-    function handleSubmit(e: React.FormEvent) {
+    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(`/users/${user.id}`);
-    }
+        form.put(`/users/${user.id}`);
+    };
 
-    function toggleArrayValue(field: 'roles' | 'permissions', value: string) {
-        setData(
-            field,
-            data[field].includes(value)
-                ? data[field].filter(v => v !== value)
-                : [...data[field], value]
-        );
-    }
+    const toggleArrayValue = (field: 'roles' | 'permissions', value: string) => {
+        const current = form.data[field];
+        const updated = current.includes(value) ? current.filter((v) => v !== value) : [...current, value];
+        form.setData(field, updated);
+    };
 
     return (
-        <div className="p-6">
-            <h1 className="text-xl font-bold mb-4">Edit User</h1>
-            <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                    <label>Name</label>
-                    <input
-                        type="text"
-                        value={data.name}
-                        onChange={e => setData('name', e.target.value)}
-                        className="border w-full p-2"
-                    />
-                    {errors.name && <div className="text-red-500">{errors.name}</div>}
-                </div>
-
-                <div>
-                    <label>Email</label>
-                    <input
-                        type="email"
-                        value={data.email}
-                        onChange={e => setData('email', e.target.value)}
-                        className="border w-full p-2"
-                    />
-                    {errors.email && <div className="text-red-500">{errors.email}</div>}
-                </div>
-
-                <div>
-                    <label>Status</label>
-                    <select
-                        value={data.status}
-                        onChange={e => setData('status', e.target.value)}
-                        className="border w-full p-2"
-                    >
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
-                    </select>
-                    {errors.status && <div className="text-red-500">{errors.status}</div>}
-                </div>
-
-                <div>
-                    <label>Password (leave blank to keep current)</label>
-                    <input
-                        type="password"
-                        value={data.password}
-                        onChange={e => setData('password', e.target.value)}
-                        className="border w-full p-2"
-                    />
-                </div>
-
-                <div>
-                    <label>Confirm Password</label>
-                    <input
-                        type="password"
-                        value={data.password_confirmation}
-                        onChange={e => setData('password_confirmation', e.target.value)}
-                        className="border w-full p-2"
-                    />
-                </div>
-
-                <div>
-                    <label>Roles</label>
-                    <div className="flex flex-wrap gap-2">
-                        {roles.map((role: string) => (
-                            <label key={role} className="flex items-center gap-1">
-                                <input
-                                    type="checkbox"
-                                    checked={data.roles.includes(role)}
-                                    onChange={() => toggleArrayValue('roles', role)}
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <Card className="mx-auto mt-6 w-full">
+                <CardHeader>
+                    <CardTitle className="text-xl">Edit User</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <form onSubmit={handleSubmit} className="flex gap-5 space-y-6">
+                        <div className="flex w-[50%] flex-col gap-8">
+                            {/* Name */}
+                            <div>
+                                <label htmlFor="name" className="mb-1 block font-semibold">
+                                    Name
+                                </label>
+                                <Input
+                                    id="name"
+                                    value={form.data.name}
+                                    onChange={(e) => form.setData('name', e.target.value)}
+                                    placeholder="Enter name"
                                 />
-                                {role}
-                            </label>
-                        ))}
-                    </div>
-                </div>
+                                {form.errors.name && <p className="text-sm text-red-500">{form.errors.name}</p>}
+                            </div>
 
-                <div>
-                    <label>Permissions</label>
-                    <div className="flex flex-wrap gap-2">
-                        {permissions.map((perm: string) => (
-                            <label key={perm} className="flex items-center gap-1">
-                                <input
-                                    type="checkbox"
-                                    checked={data.permissions.includes(perm)}
-                                    onChange={() => toggleArrayValue('permissions', perm)}
+                            {/* Email */}
+                            <div>
+                                <label htmlFor="email" className="mb-1 block font-semibold">
+                                    Email
+                                </label>
+                                <Input
+                                    id="email"
+                                    type="email"
+                                    value={form.data.email}
+                                    onChange={(e) => form.setData('email', e.target.value)}
+                                    placeholder="Enter email"
                                 />
-                                {perm}
-                            </label>
-                        ))}
-                    </div>
-                </div>
+                                {form.errors.email && <p className="text-sm text-red-500">{form.errors.email}</p>}
+                            </div>
 
-                <div className="flex gap-2">
-                    <button
-                        type="submit"
-                        disabled={processing}
-                        className="px-4 py-2 bg-blue-600 text-white rounded"
-                    >
-                        Update
-                    </button>
-                    <Link href="/users" className="px-4 py-2 bg-gray-500 text-white rounded">
-                        Cancel
-                    </Link>
-                </div>
-            </form>
-        </div>
+                            {/* Status */}
+                            <div>
+                                <label htmlFor="status" className="mb-1 block font-semibold">
+                                    Status
+                                </label>
+                                <Select value={form.data.status} onValueChange={(value) => form.setData('status', value)}>
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue placeholder="Select status" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="active">Active</SelectItem>
+                                        <SelectItem value="inactive">Inactive</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                {form.errors.status && <p className="text-sm text-red-500">{form.errors.status}</p>}
+                            </div>
+
+                            {/* Password */}
+                            <div>
+                                <label htmlFor="password" className="mb-1 block font-semibold">
+                                    Password (optional)
+                                </label>
+                                <Input
+                                    id="password"
+                                    type="password"
+                                    value={form.data.password}
+                                    onChange={(e) => form.setData('password', e.target.value)}
+                                    placeholder="Leave blank to keep current password"
+                                />
+                            </div>
+
+                            {/* Confirm Password */}
+                            <div>
+                                <label htmlFor="password_confirmation" className="mb-1 block font-semibold">
+                                    Confirm Password
+                                </label>
+                                <Input
+                                    id="password_confirmation"
+                                    type="password"
+                                    value={form.data.password_confirmation}
+                                    onChange={(e) => form.setData('password_confirmation', e.target.value)}
+                                    placeholder="Confirm new password"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="flex w-[50%] flex-col gap-8">
+                            {/* Roles */}
+                            <div>
+                                <label className="mb-2 block font-semibold">Roles</label>
+                                <div className="flex flex-wrap gap-3">
+                                    {roles.map((role) => (
+                                        <label key={role} htmlFor={`role-${role}`} className="flex cursor-pointer items-center gap-2 select-none">
+                                            <Checkbox
+                                                id={`role-${role}`}
+                                                checked={form.data.roles.includes(role)}
+                                                onCheckedChange={() => toggleArrayValue('roles', role)}
+                                            />
+                                            <span>{role}</span>
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Permissions */}
+                            <div>
+                                <label className="mb-2 block font-semibold">Permissions</label>
+                                <div className="flex flex-wrap gap-3">
+                                    {permissions.map((perm) => (
+                                        <label key={perm} htmlFor={`perm-${perm}`} className="flex cursor-pointer items-center gap-2 select-none">
+                                            <Checkbox
+                                                id={`perm-${perm}`}
+                                                checked={form.data.permissions.includes(perm)}
+                                                onCheckedChange={() => toggleArrayValue('permissions', perm)}
+                                            />
+                                            <span>{perm}</span>
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Buttons */}
+                            <div className="flex gap-3">
+                                <Button type="submit" disabled={form.processing}>
+                                    Update User
+                                </Button>
+                                <Link href="/users">
+                                    <Button variant="outline">Cancel</Button>
+                                </Link>
+                            </div>
+                        </div>
+                    </form>
+                </CardContent>
+            </Card>
+        </AppLayout>
     );
 }

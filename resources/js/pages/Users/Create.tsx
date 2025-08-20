@@ -1,14 +1,24 @@
-import { useForm, Link, usePage } from '@inertiajs/react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import AppLayout from '@/layouts/app-layout';
+import { Link, useForm, usePage } from '@inertiajs/react';
 
 type PageProps = {
     roles: string[];
     permissions: string[];
 };
 
+const breadcrumbs = [
+    { title: 'Users', href: '/users' },
+    { title: 'Create', href: '/users/create' },
+];
+
 export default function Create() {
     const { roles, permissions } = usePage<PageProps>().props;
 
-    const { data, setData, post, processing, errors } = useForm({
+    const form = useForm({
         name: '',
         email: '',
         password: '',
@@ -17,109 +27,133 @@ export default function Create() {
         permissions: [] as string[],
     });
 
-    function handleSubmit(e: React.FormEvent) {
+    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post('/users');
-    }
+        form.post('/users');
+    };
 
-    function toggleArrayValue(field: 'roles' | 'permissions', value: string) {
-        setData(field, data[field].includes(value)
-            ? data[field].filter(v => v !== value)
-            : [...data[field], value]);
-    }
+    const toggleArrayValue = (field: 'roles' | 'permissions', value: string) => {
+        const prev = form.data[field];
+        const updated = prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value];
+        form.setData(field, updated);
+    };
 
     return (
-        <div className="p-6">
-            <h1 className="text-xl font-bold mb-4">Create User</h1>
-            <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                    <label>Name</label>
-                    <input
-                        type="text"
-                        value={data.name}
-                        onChange={e => setData('name', e.target.value)}
-                        className="border w-full p-2"
-                    />
-                    {errors.name && <div className="text-red-500">{errors.name}</div>}
-                </div>
-
-                <div>
-                    <label>Email</label>
-                    <input
-                        type="email"
-                        value={data.email}
-                        onChange={e => setData('email', e.target.value)}
-                        className="border w-full p-2"
-                    />
-                    {errors.email && <div className="text-red-500">{errors.email}</div>}
-                </div>
-
-                <div>
-                    <label>Password</label>
-                    <input
-                        type="password"
-                        value={data.password}
-                        onChange={e => setData('password', e.target.value)}
-                        className="border w-full p-2"
-                    />
-                    {errors.password && <div className="text-red-500">{errors.password}</div>}
-                </div>
-
-                <div>
-                    <label>Confirm Password</label>
-                    <input
-                        type="password"
-                        value={data.password_confirmation}
-                        onChange={e => setData('password_confirmation', e.target.value)}
-                        className="border w-full p-2"
-                    />
-                </div>
-
-                <div>
-                    <label>Roles</label>
-                    <div className="flex flex-wrap gap-2">
-                        {roles.map((role: string) => (
-                            <label key={role} className="flex items-center gap-1">
-                                <input
-                                    type="checkbox"
-                                    checked={data.roles.includes(role)}
-                                    onChange={() => toggleArrayValue('roles', role)}
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <Card className="mx-auto mt-6 w-full">
+                <CardHeader>
+                    <CardTitle className="text-xl">Create User</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <form onSubmit={handleSubmit} className="space-y-6 flex gap-5">
+                        <div className="flex flex-col gap-8 w-[50%]">
+                             {/* Name */}
+                            <div>
+                                <label htmlFor="name" className="mb-1 block font-semibold">
+                                    Name
+                                </label>
+                                <Input
+                                    id="name"
+                                    type="text"
+                                    value={form.data.name}
+                                    onChange={(e) => form.setData('name', e.target.value)}
+                                    placeholder="Enter name"
                                 />
-                                {role}
-                            </label>
-                        ))}
-                    </div>
-                </div>
+                                {form.errors.name && <p className="mt-1 text-red-600">{form.errors.name}</p>}
+                            </div>
 
-                <div>
-                    <label>Permissions</label>
-                    <div className="flex flex-wrap gap-2">
-                        {permissions.map((perm: string) => (
-                            <label key={perm} className="flex items-center gap-1">
-                                <input
-                                    type="checkbox"
-                                    checked={data.permissions.includes(perm)}
-                                    onChange={() => toggleArrayValue('permissions', perm)}
+                            {/* Email */}
+                            <div>
+                                <label htmlFor="email" className="mb-1 block font-semibold">
+                                    Email
+                                </label>
+                                <Input
+                                    id="email"
+                                    type="email"
+                                    value={form.data.email}
+                                    onChange={(e) => form.setData('email', e.target.value)}
+                                    placeholder="Enter email"
                                 />
-                                {perm}
-                            </label>
-                        ))}
-                    </div>
-                </div>
+                                {form.errors.email && <p className="mt-1 text-red-600">{form.errors.email}</p>}
+                            </div>
 
-                <div className="flex gap-2">
-                    <button
-                        type="submit"
-                        disabled={processing}
-                        className="px-4 py-2 bg-blue-600 text-white rounded"
-                    >
-                        Save
-                    </button>
-                    <Link href="/users" className="px-4 py-2 bg-gray-500 text-white rounded">
-                        Cancel
-                    </Link>
-                </div>
-            </form>
-        </div>
+                            {/* Password */}
+                            <div>
+                                <label htmlFor="password" className="mb-1 block font-semibold">
+                                    Password
+                                </label>
+                                <Input
+                                    id="password"
+                                    type="password"
+                                    value={form.data.password}
+                                    onChange={(e) => form.setData('password', e.target.value)}
+                                    placeholder="Enter password"
+                                />
+                                {form.errors.password && <p className="mt-1 text-red-600">{form.errors.password}</p>}
+                            </div>
+
+                            {/* Confirm Password */}
+                            <div>
+                                <label htmlFor="password_confirmation" className="mb-1 block font-semibold">
+                                    Confirm Password
+                                </label>
+                                <Input
+                                    id="password_confirmation"
+                                    type="password"
+                                    value={form.data.password_confirmation}
+                                    onChange={(e) => form.setData('password_confirmation', e.target.value)}
+                                    placeholder="Confirm password"
+                                />
+                            </div>
+                        </div>
+                        <div className="flex flex-col gap-8 w-[50%]">
+                            {/* Roles */}
+                            <div>
+                                <label className="mb-2 block font-semibold">Roles</label>
+                                <div className="flex flex-wrap gap-3">
+                                    {roles.map((role) => (
+                                        <label key={role} className="flex cursor-pointer items-center gap-2 select-none" htmlFor={`role-${role}`}>
+                                            <Checkbox
+                                                id={`role-${role}`}
+                                                checked={form.data.roles.includes(role)}
+                                                onCheckedChange={() => toggleArrayValue('roles', role)}
+                                            />
+                                            <span>{role}</span>
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Permissions */}
+                            <div>
+                                <label className="mb-2 block font-semibold">Permissions</label>
+                                <div className="flex flex-wrap gap-3">
+                                    {permissions.map((perm) => (
+                                        <label key={perm} className="flex cursor-pointer items-center gap-2 select-none" htmlFor={`perm-${perm}`}>
+                                            <Checkbox
+                                                id={`perm-${perm}`}
+                                                checked={form.data.permissions.includes(perm)}
+                                                onCheckedChange={() => toggleArrayValue('permissions', perm)}
+                                            />
+                                            <span>{perm}</span>
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Buttons */}
+                            <div className="flex gap-3">
+                                <Button type="submit" disabled={form.processing}>
+                                    Create User
+                                </Button>
+                                <Link href="/users">
+                                    <Button variant="outline">Cancel</Button>
+                                </Link>
+                            </div>
+                        </div>
+                    </form>
+                </CardContent>
+            </Card>
+        </AppLayout>
     );
 }
