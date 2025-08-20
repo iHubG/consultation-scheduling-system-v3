@@ -4,7 +4,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import useCan from '@/hooks/useCan';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Link, router, usePage, Head } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
@@ -43,9 +43,15 @@ export default function Index() {
         }
     };
 
+    const roleTextColors: Record<string, string> = {
+        admin: 'text-red-600',
+        faculty: 'text-blue-600',
+        student: 'text-green-600',
+    };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-          <Head title="Roles & Permissions" />
+            <Head title="Roles & Permissions" />
             <Card className="mx-auto mt-6 w-full">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0">
                     <CardTitle className="text-xl">Roles & Permissions</CardTitle>
@@ -69,13 +75,13 @@ export default function Index() {
                         <TableBody>
                             {roles.map((role) => (
                                 <TableRow key={role.id}>
-                                    <TableCell className="font-medium">{role.name}</TableCell>
+                                    <TableCell className={`${roleTextColors[role.name] ?? 'text-foreground'} font-medium`}>{role.name}</TableCell>
                                     <TableCell className="text-muted-foreground">{role.permissions.join(', ')}</TableCell>
                                     <TableCell className="space-x-2 text-right">
                                         {can('role.edit') && (
                                             <Link href={`/roles-permissions/${role.id}/edit`}>
                                                 <Button variant="blue" size="icon" className="h-8 w-8" aria-label="Edit">
-                                                    <Pencil className="h-4 w-4 " />
+                                                    <Pencil className="h-4 w-4" />
                                                 </Button>
                                             </Link>
                                         )}

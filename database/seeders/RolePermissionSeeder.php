@@ -6,57 +6,42 @@ use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class RolePermissionSeeder extends Seeder
 {
     public function run()
     {
-        // Permissions
+        // Define permissions
         $permissions = [
-            // User permissions
             'user.view',
             'user.create',
             'user.edit',
             'user.delete',
-
-            // Role & Permission management
             'role.view',
             'role.create',
             'role.edit',
             'role.delete',
         ];
 
+        // Create permissions
         foreach ($permissions as $permission) {
             Permission::firstOrCreate(['name' => $permission]);
         }
 
-        // Roles
+        // Create admin role and assign all permissions
         $admin = Role::firstOrCreate(['name' => 'admin']);
-        $faculty = Role::firstOrCreate(['name' => 'faculty']);
-        $student = Role::firstOrCreate(['name' => 'student']);
+        $admin->syncPermissions($permissions);
 
-        // Assign permissions to roles
-        $admin->syncPermissions($permissions); // Admin gets all permissions
-        $faculty->syncPermissions(['user.view', 'user.edit']); // Faculty limited to user view/edit
-        $student->syncPermissions(['user.view']); // Student only user view
-
-        // Create sample users
+        // Create admin user and assign role
         $adminUser = User::firstOrCreate(
             ['email' => 'admin@example.com'],
-            ['name' => 'Admin User', 'password' => bcrypt('password')]
+            [
+                'name' => 'Admin User',
+                'password' => Hash::make('password')
+            ]
         );
+
         $adminUser->assignRole('admin');
-
-        $facultyUser = User::firstOrCreate(
-            ['email' => 'faculty@example.com'],
-            ['name' => 'Faculty User', 'password' => bcrypt('password')]
-        );
-        $facultyUser->assignRole('faculty');
-
-        $studentUser = User::firstOrCreate(
-            ['email' => 'student@example.com'],
-            ['name' => 'Student User', 'password' => bcrypt('password')]
-        );
-        $studentUser->assignRole('student');
     }
 }
