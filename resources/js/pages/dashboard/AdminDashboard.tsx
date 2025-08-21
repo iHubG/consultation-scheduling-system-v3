@@ -7,6 +7,7 @@ import { type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 
 import { Activity, BookOpen, ClipboardList, Clock, Download, LayoutDashboard, Settings, TrendingUp, UserPlus, Users } from 'lucide-react';
+import { JSX } from 'react';
 
 export default function AdminDashboard() {
     const { auth, systemStats, recentActivity } = usePage<SharedData>().props;
@@ -21,21 +22,19 @@ export default function AdminDashboard() {
         return icons[type] ?? <Activity className="h-4 w-4 text-gray-500" />;
     };
 
+
     if (!systemStats || !recentActivity) {
         return (
             <div className="space-y-6 p-6">
-                {/* Header Skeleton */}
                 <Skeleton className="h-8 w-1/3" />
                 <Skeleton className="h-4 w-1/2" />
 
-                {/* Stats Cards Skeleton */}
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     {[...Array(4)].map((_, i) => (
                         <Skeleton key={i} className="h-28 rounded-md" />
                     ))}
                 </div>
 
-                {/* Main Section Skeleton */}
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
                     <div className="space-y-4 lg:col-span-2">
                         {[...Array(4)].map((_, i) => (

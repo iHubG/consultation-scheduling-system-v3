@@ -10,26 +10,32 @@ class TestUserSeeder extends Seeder
 {
     public function run(): void
     {
-        // Create 10 faculty users
-        for ($i = 1; $i <= 10; $i++) {
-            $user = User::create([
-                'name' => "Faculty User {$i}",
-                'email' => "faculty{$i}@example.com",
-                'password' => Hash::make('password'),
-            ]);
+        for ($i = 1; $i <= 100; $i++) {
+            $email = "faculty{$i}@example.com";
 
-            $user->assignRole('faculty');
+            if (!User::where('email', $email)->exists()) {
+                $user = User::create([
+                    'name' => "Faculty User {$i}",
+                    'email' => $email,
+                    'password' => Hash::make('password'),
+                ]);
+
+                $user->assignRole('faculty');
+            }
         }
 
-        // Create 10 student users
-        for ($i = 1; $i <= 10; $i++) {
-            $user = User::create([
-                'name' => "Student User {$i}",
-                'email' => "student{$i}@example.com",
-                'password' => Hash::make('password'),
-            ]);
+        for ($i = 1; $i <= 100; $i++) {
+            $email = "student{$i}@example.com";
 
-            $user->assignRole('student');
+            if (!User::where('email', $email)->exists()) {
+                $user = User::create([
+                    'name' => "Student User {$i}",
+                    'email' => $email,
+                    'password' => Hash::make('password'),
+                ]);
+
+                $user->assignRole('student');
+            }
         }
     }
 }

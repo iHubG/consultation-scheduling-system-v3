@@ -16,9 +16,8 @@ class UserController extends Controller
 {
     $paginator = User::with('roles', 'permissions')
         ->oldest()
-        ->paginate(10);
+        ->paginate(20);
 
-    // Apply the transformation to only the data
     $transformed = $paginator->getCollection()->map(fn($user) => [
         'id' => $user->id,
         'name' => $user->name,
@@ -28,7 +27,6 @@ class UserController extends Controller
         'permissions' => $user->getAllPermissions()->pluck('name')->toArray(),
     ]);
 
-    // Replace the original data with transformed data
     $paginator->setCollection($transformed);
 
     return Inertia::render('users/Index', [
