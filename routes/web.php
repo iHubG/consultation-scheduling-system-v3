@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ConsultationAreasController;
 use App\Http\Controllers\RolesPermissionsController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -17,6 +18,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::resource('users', UserController::class);
     Route::resource('roles-permissions', RolesPermissionsController::class);
+    Route::resource('consultation-areas', ConsultationAreasController::class);
 });
 
 Route::prefix('roles-permissions')->name('roles-permissions.')->middleware('auth')->group(function () {

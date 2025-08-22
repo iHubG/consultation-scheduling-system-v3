@@ -92,3 +92,11 @@ export interface Paginated<T> {
     to: number;
     total: number;
 }
+
+export interface ConsultationAreas {
+    id: number;
+    building: string;
+    room: string;
+    created_at: string;
+    updated_at: string;
+}

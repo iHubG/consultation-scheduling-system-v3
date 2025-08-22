@@ -61,8 +61,8 @@ export function Notification() {
           <Bell className="w-6 h-6 text-gray-700" />
           {count > 0 && (
             <span
-              className="absolute top-2 right-3 inline-flex items-center justify-center
-              px-2 py-1 text-xs font-bold leading-none text-white bg-red-600 rounded-full
+              className="absolute top-3 right-3 inline-flex items-center justify-center
+              text-xss py-[3px] px-[6px] font-bold leading-none text-white bg-red-600 rounded-full
               transform translate-x-1/2 -translate-y-1/2"
             >
               {count}

@@ -22,6 +22,10 @@ class RolePermissionSeeder extends Seeder
             'role.create',
             'role.edit',
             'role.delete',
+            'area.view',
+            'area.create',
+            'area.edit',
+            'area.delete',
         ];
 
         // Create permissions

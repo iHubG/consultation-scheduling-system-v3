@@ -50,7 +50,7 @@ export default function Index() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Card className="mx-auto mt-6 w-full">
-                <CardHeader className="flex flex-row items-center justify-between gap-5 space-y-0">
+                <CardHeader className="flex flex-col md:flex-row items-center justify-between gap-5 space-y-0">
                     <CardTitle className="text-xl">Users</CardTitle>
                     <SearchAndFilterUsers />
 
