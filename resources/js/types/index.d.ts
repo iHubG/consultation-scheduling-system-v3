@@ -22,6 +22,12 @@ export interface NavItem {
     isActive?: boolean;
 }
 
+export interface Filters {
+  search?: string;
+  status?: string;
+  role?: string;
+  sort?: string;
+}
 export interface SharedData {
     name: string;
     quote: { message: string; author: string };
@@ -29,6 +35,7 @@ export interface SharedData {
     ziggy: Config & { location: string };
     sidebarOpen: boolean;
     systemStats?: SystemStats;
+    filters?: Filters; 
     recentActivity?: ActivityItem[];
     [key: string]: unknown;
 }

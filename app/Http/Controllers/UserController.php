@@ -12,27 +12,59 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
- public function index()
-{
-    $paginator = User::with('roles', 'permissions')
-        ->oldest()
-        ->paginate(20);
+    public function index(Request $request)
+    {
+        $query = User::with('roles', 'permissions');
 
-    $transformed = $paginator->getCollection()->map(fn($user) => [
-        'id' => $user->id,
-        'name' => $user->name,
-        'email' => $user->email,
-        'status' => $user->status,
-        'roles' => $user->getRoleNames()->toArray(),
-        'permissions' => $user->getAllPermissions()->pluck('name')->toArray(),
-    ]);
+        if ($request->filled('search')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->search . '%')
+                    ->orWhere('email', 'like', '%' . $request->search . '%');
+            });
+        }
 
-    $paginator->setCollection($transformed);
+        if ($request->filled('status') && $request->status !== 'all') {
+            $query->where('status', $request->status);
+        }
 
-    return Inertia::render('users/Index', [
-        'users' => $paginator,
-    ]);
-}
+        if ($request->filled('role') && $request->role !== 'all') {
+            $query->whereHas('roles', function ($q) use ($request) {
+                $q->where('name', $request->role);
+            });
+        }
+
+        switch ($request->input('sort')) {
+            case 'latest':
+                $query->latest();
+                break;
+            case 'name':
+                $query->orderBy('name');
+                break;
+            default:
+                $query->oldest();
+                break;
+        }
+
+        $paginator = $query->paginate(10)->withQueryString();
+
+        $transformed = $paginator->getCollection()->map(fn($user) => [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'status' => $user->status,
+            'created_at' => $user->created_at,
+            'roles' => $user->getRoleNames()->toArray(),
+            'permissions' => $user->getAllPermissions()->pluck('name')->toArray(),
+        ]);
+
+        $paginator->setCollection($transformed);
+
+        return Inertia::render('users/Index', [
+            'users' => $paginator,
+            'filters' => (object) request()->only(['search', 'status', 'role', 'sort']),
+        ]);
+    }
+
 
 
     public function create()
