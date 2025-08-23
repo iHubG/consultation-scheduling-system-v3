@@ -33,8 +33,12 @@ export default function Edit({ role, permissions }: PageProps) {
     };
 
     return (
-        <AppLayout breadcrumbs={[{ title: 'Roles & Permissions', href: '/roles-permissions' },  { title: 'Edit Role', href: `/roles-permissions/${role.id}/edit` },]}>
-
+        <AppLayout
+            breadcrumbs={[
+                { title: 'Roles & Permissions', href: '/roles-permissions' },
+                { title: 'Edit Role', href: `/roles-permissions/${role.id}/edit` },
+            ]}
+        >
             <Card className="mx-auto mt-6 w-full">
                 <CardHeader>
                     <CardTitle>Edit Role</CardTitle>

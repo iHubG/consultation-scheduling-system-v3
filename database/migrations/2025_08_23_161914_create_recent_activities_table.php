@@ -11,8 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('consultation_areas', function (Blueprint $table) {
+        Schema::create('recent_activities', function (Blueprint $table) {
             $table->id();
+            $table->string('action');
+            $table->string('user');
+            $table->string('type');
             $table->timestamps();
         });
     }
@@ -22,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('consultation_areas');
+        Schema::dropIfExists('recent_activities');
     }
 };

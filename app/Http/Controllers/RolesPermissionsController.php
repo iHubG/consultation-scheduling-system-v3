@@ -7,6 +7,8 @@ use Inertia\Inertia;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use App\Http\Controllers\Controller;
+use App\Models\RecentActivity;
+use Illuminate\Support\Facades\Auth;
 
 class RolesPermissionsController extends Controller
 {
@@ -23,7 +25,7 @@ class RolesPermissionsController extends Controller
      */
     public function index()
     {
-        $roles = Role::with('permissions')->get()->map(fn ($role) => [
+        $roles = Role::with('permissions')->get()->map(fn($role) => [
             'id' => $role->id,
             'name' => $role->name,
             'permissions' => $role->permissions->pluck('name'),
@@ -65,6 +67,12 @@ class RolesPermissionsController extends Controller
             $role->syncPermissions($data['permissions']);
         }
 
+        RecentActivity::create([
+            'action' => 'Created role: ' . $role->name,
+            'user' => Auth::user()->name ?? 'System',
+            'type' => 'role',
+        ]);
+
         return redirect()->route('roles-permissions.index')->with('success', 'Role created.');
     }
 
@@ -101,6 +109,12 @@ class RolesPermissionsController extends Controller
 
         $rolesPermission->syncPermissions($data['permissions'] ?? []);
 
+        RecentActivity::create([
+            'action' => 'Updated role: ' . $rolesPermission->name,
+            'user' => Auth::user()->name ?? 'System',
+            'type' => 'role',
+        ]);
+
         return redirect()->route('roles-permissions.index')->with('success', 'Role updated.');
     }
 
@@ -109,7 +123,14 @@ class RolesPermissionsController extends Controller
      */
     public function destroy(Role $rolesPermission)
     {
+        $roleName = $rolesPermission->name;
         $rolesPermission->delete();
+
+        RecentActivity::create([
+            'action' => 'Deleted role: ' . $roleName,
+            'user' => Auth::user()->name ?? 'System',
+            'type' => 'role',
+        ]);
 
         return redirect()->route('roles-permissions.index')->with('success', 'Role deleted.');
     }

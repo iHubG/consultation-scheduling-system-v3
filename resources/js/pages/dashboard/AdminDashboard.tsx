@@ -18,10 +18,10 @@ export default function AdminDashboard() {
             consultation: <ClipboardList className="h-4 w-4 text-blue-500" />,
             system: <Settings className="h-4 w-4 text-orange-500" />,
             area: <LayoutDashboard className="h-4 w-4 text-purple-500" />,
+            role: <UserPlus className="h-4 w-4 text-indigo-500" />,
         };
         return icons[type] ?? <Activity className="h-4 w-4 text-gray-500" />;
     };
-
 
     if (!systemStats || !recentActivity) {
         return (
@@ -152,7 +152,7 @@ export default function AdminDashboard() {
                         <CardContent className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                             {[
                                 {
-                                    href: '/manage-users',
+                                    href: '/users',
                                     title: 'Manage Users',
                                     subtitle: 'Students & Faculty',
                                     icon: <UserPlus className="h-5 w-5 text-blue-600 dark:text-blue-400" />,
@@ -176,7 +176,7 @@ export default function AdminDashboard() {
                                     hover: 'hover:border-purple-200 hover:bg-purple-50 dark:hover:bg-purple-900/20',
                                 },
                                 {
-                                    href: '/consultation-activity',
+                                    href: '/consultations',
                                     title: 'Activity Monitor',
                                     subtitle: 'All Consultations',
                                     icon: <ClipboardList className="h-5 w-5 text-orange-600 dark:text-orange-400" />,
@@ -202,31 +202,36 @@ export default function AdminDashboard() {
 
                 {/* Recent Activity */}
                 <Card className="border-0 shadow-sm">
-                    <CardHeader className="pb-4">
+                    <CardHeader className="pb-0">
                         <CardTitle className="flex items-center gap-2 text-lg font-semibold">
                             <Activity className="h-5 w-5" />
                             Recent Activity
                         </CardTitle>
                     </CardHeader>
+
                     <CardContent>
-                        <div className="space-y-4">
-                            {recentActivity.map((activity, index) => (
-                                <div key={activity.id} className="relative flex items-start gap-3">
-                                    <div className="mt-0.5">{getActivityIcon(activity.type)}</div>
-                                    <div className="min-w-0 flex-1">
-                                        <p className="truncate text-sm font-medium text-gray-900 dark:text-gray-100">{activity.action}</p>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400">{activity.user}</p>
-                                        <p className="text-xs text-gray-400 dark:text-gray-500">{activity.time}</p>
+                        <div className="my-4 max-h-80 space-y-4 overflow-y-auto pr-1">
+                            {(recentActivity || []).length === 0 ? (
+                                <p className="text-sm text-gray-500 dark:text-gray-400">No recent activity yet.</p>
+                            ) : (
+                                (recentActivity || []).map((activity, index) => (
+                                    <div key={activity.id} className="space-y-1">
+                                        <div className="flex items-start gap-3">
+                                            <div className="mt-0.5">{getActivityIcon(activity.type)}</div>
+                                            <div className="min-w-0 flex-1">
+                                                <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{activity.action}</p>
+                                                <p className="text-xs text-gray-500 dark:text-gray-400">{activity.user}</p>
+                                                <p className="text-xs text-gray-400 dark:text-gray-500">{activity.time}</p>
+                                            </div>
+                                        </div>
+                                        {index < recentActivity.length - 1 && <Separator className="my-3" />}
                                     </div>
-                                    {index < recentActivity.length - 1 && (
-                                        <Separator className="absolute left-0 mt-15 h-4 w-px bg-gray-200 dark:bg-gray-700" />
-                                    )}
-                                </div>
-                            ))}
+                                ))
+                            )}
                         </div>
-                        <Separator className="my-4" />
-                        <Button variant="outline" size="sm" className="w-full">
-                            View All Activity
+
+                        <Button variant="outline" size="sm" className="w-full" disabled>
+                            View All Activity (Coming Soon)
                         </Button>
                     </CardContent>
                 </Card>

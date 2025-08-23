@@ -5,26 +5,39 @@ namespace App\Http\Controllers;
 use App\Models\ConsultationArea;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Models\RecentActivity;
+use Illuminate\Support\Facades\Auth;
 
 class ConsultationAreasController extends Controller
 {
-    // public function __construct()
-    // {
-    //     $this->middleware('permission:area.view', ['only' => ['index']]);
-    //     $this->middleware('permission:area.create', ['only' => ['create', 'store']]);
-    //     $this->middleware('permission:area.edit', ['only' => ['edit', 'update']]);
-    //     $this->middleware('permission:area.delete', ['only' => ['destroy']]);
-    // }
-
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $consultationAreas = ConsultationArea::paginate(10);
+        $sort = $request->query('sort');
+
+        $query = ConsultationArea::query();
+
+        switch ($sort) {
+            case 'name':
+                $query->orderBy('building')->orderBy('room');
+                break;
+            case 'latest':
+                $query->latest();
+                break;
+            case 'oldest':
+                $query->oldest();
+                break;
+        }
+
+        $consultationAreas = $query->paginate(10)->withQueryString();
 
         return Inertia::render('consultationAreas/Index', [
             'consultationAreas' => $consultationAreas,
+            'filters' => [
+                'sort' => $sort,
+            ],
         ]);
     }
 
@@ -46,7 +59,13 @@ class ConsultationAreasController extends Controller
             'room' => 'required|string|max:255',
         ]);
 
-        ConsultationArea::create($validated);
+        $area = ConsultationArea::create($validated);
+
+        RecentActivity::create([
+            'action' => 'Created consultation area: ' . $area->building . ' ' . $area->room,
+            'user' => Auth::user()?->name ?? 'System',
+            'type' => 'area',
+        ]);
 
         return redirect()->route('consultation-areas.index')
             ->with('success', 'Consultation area created successfully.');
@@ -78,6 +97,12 @@ class ConsultationAreasController extends Controller
 
         $area->update($validated);
 
+        RecentActivity::create([
+            'action' => 'Updated consultation area: ' . $area->building . ' ' . $area->room,
+            'user' => Auth::user()?->name ?? 'System',
+            'type' => 'area',
+        ]);
+
         return redirect()->route('consultation-areas.index')
             ->with('success', 'Consultation area updated successfully.');
     }
@@ -88,8 +113,15 @@ class ConsultationAreasController extends Controller
     public function destroy(string $id)
     {
         $area = ConsultationArea::findOrFail($id);
+        $areaName = $area->building . ' ' . $area->room;
 
         $area->delete();
+
+        RecentActivity::create([
+            'action' => 'Deleted consultation area: ' . $areaName,
+            'user' => Auth::user()?->name ?? 'System',
+            'type' => 'area',
+        ]);
 
         return redirect()->route('consultation-areas.index')
             ->with('success', 'Consultation area deleted successfully.');

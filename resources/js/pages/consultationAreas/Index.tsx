@@ -1,3 +1,5 @@
+import AreasFilters from '@/components/AreasFilters';
+import Pagination from '@/components/Pagination';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import useCan from '@/hooks/useCan';
@@ -18,7 +20,6 @@ type PageProps = {
     };
 };
 
-// Format ISO date to readable format (e.g., Aug 23, 2025)
 const formatDate = (dateString: string) =>
     new Intl.DateTimeFormat('en-US', {
         year: 'numeric',
@@ -48,14 +49,17 @@ export default function Index() {
             <Card className="mx-auto mt-6 w-full">
                 <CardHeader className="flex flex-row items-center justify-between gap-5 space-y-0">
                     <CardTitle className="text-xl font-semibold">Consultation Areas</CardTitle>
-                    {can('area.create') && (
-                        <Link href="/consultation-areas/create">
-                            <Button size="sm" className="h-8">
-                                <Plus className="mr-2 h-4 w-4" />
-                                Add Area
-                            </Button>
-                        </Link>
-                    )}
+                    <div className="flex flex-col gap-5 md:flex-row">
+                        <AreasFilters />
+                        {can('area.create') && (
+                            <Link href="/consultation-areas/create">
+                                <Button size="sm" className="h-8">
+                                    <Plus className="mr-2 h-4 w-4" />
+                                    Add Area
+                                </Button>
+                            </Link>
+                        )}
+                    </div>
                 </CardHeader>
 
                 <CardContent>
@@ -103,6 +107,7 @@ export default function Index() {
                             ))}
                         </div>
                     )}
+                    <div className="mt-6">{consultationAreas && <Pagination data={consultationAreas} />}</div>
                 </CardContent>
             </Card>
         </AppLayout>
