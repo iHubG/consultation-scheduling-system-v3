@@ -18,15 +18,24 @@ class RolePermissionSeeder extends Seeder
             'user.create',
             'user.edit',
             'user.delete',
+
             'role.view',
             'role.create',
             'role.edit',
             'role.delete',
+
             'area.view',
             'area.create',
             'area.edit',
             'area.delete',
+
+            'consultation.view',
+            'consultation.create',
+            'consultation.edit',
+            'consultation.delete',
+            'consultation.approve',
         ];
+
 
         // Create permissions
         foreach ($permissions as $permission) {

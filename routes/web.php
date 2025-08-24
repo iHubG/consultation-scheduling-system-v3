@@ -1,11 +1,14 @@
 <?php
 
-use App\Http\Controllers\ConsultationAreasController;
-use App\Http\Controllers\RolesPermissionsController;
+
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ConsultationAreasController;
+use App\Http\Controllers\RolesPermissionsController;
+use App\Http\Controllers\ConsultationsController;
+use App\Http\Controllers\StudentController;
 
 Route::get('/', function () {
     return Inertia::render('welcome');
@@ -19,6 +22,16 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('users', UserController::class);
     Route::resource('roles-permissions', RolesPermissionsController::class);
     Route::resource('consultation-areas', ConsultationAreasController::class);
+    Route::resource('consultations', ConsultationsController::class);
+    Route::post('/consultations/{consultation}/approve', [ConsultationsController::class, 'approve'])->name('consultations.approve');
+    Route::post('/consultations/{consultation}/decline', [ConsultationsController::class, 'decline'])->name('consultations.decline');
+    Route::post('/consultations/{consultation}/request', [ConsultationsController::class, 'requestToJoin'])->middleware('auth');
+
+    Route::middleware(['auth', 'role:student'])->group(function () {
+        Route::get('/student/request', [StudentController::class, 'index'])->name('student.request');
+        Route::post('/consultations/{consultation}/request-to-join', [StudentController::class, 'requestToJoin'])->name('consultations.requestToJoin');
+         Route::get('/student/appointments', [StudentController::class, 'appointments'])->name('student.appointments');
+    });
 });
 
 Route::prefix('roles-permissions')->name('roles-permissions.')->middleware('auth')->group(function () {
@@ -31,5 +44,5 @@ Route::fallback(function () {
     return Inertia::render('NotFound')->toResponse(request())->setStatusCode(404);
 });
 
-require __DIR__.'/settings.php';
-require __DIR__.'/auth.php';
+require __DIR__ . '/settings.php';
+require __DIR__ . '/auth.php';

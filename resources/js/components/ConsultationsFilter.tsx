@@ -4,7 +4,7 @@ import { router, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 
 
-export default function AreasUsers() {
+export default function ConsultationsFilter() {
 
     const { filters = {} } = usePage<SharedData>().props;
 
@@ -15,7 +15,7 @@ export default function AreasUsers() {
     useEffect(() => {
         const timeout = setTimeout(() => {
             router.get(
-                '/consultation-areas',
+                '/consultations',
                 {
                     sort: sortOrder === 'all' ? '' : sortOrder,
                 },
@@ -35,7 +35,6 @@ export default function AreasUsers() {
                 <SelectContent>
                     <SelectGroup>
                         <SelectLabel>Sort</SelectLabel>
-                        <SelectItem value="name">Name</SelectItem>
                         <SelectItem value="latest">Latest</SelectItem>
                         <SelectItem value="oldest">Oldest</SelectItem>
                     </SelectGroup>

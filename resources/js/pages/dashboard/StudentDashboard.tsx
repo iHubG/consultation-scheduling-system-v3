@@ -26,7 +26,7 @@ export default function StudentDashboard() {
                         <p className="mb-4 text-sm text-gray-500 dark:text-gray-400">
                             Schedule a consultation with your preferred faculty member.
                         </p>
-                        <Link href="/consultations/request">
+                        <Link href="/student/request">
                             <Button className="w-full">Start Request</Button>
                         </Link>
                     </CardContent>
@@ -43,8 +43,8 @@ export default function StudentDashboard() {
                         <p className="mb-4 text-sm text-gray-500 dark:text-gray-400">
                             Track your upcoming and completed consultations.
                         </p>
-                        <Link href="/consultations/status">
-                            <Button className="w-full" variant="outline">View Status</Button>
+                        <Link href="/student/appointments">
+                            <Button className="w-full" variant="outline">View Appointments</Button>
                         </Link>
                     </CardContent>
                 </Card>

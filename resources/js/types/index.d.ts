@@ -100,3 +100,35 @@ export interface ConsultationAreas {
     created_at: string;
     updated_at: string;
 }
+
+export interface Faculty {
+    id: number;
+    name: string;
+    [key: string]: unknown;
+}
+
+export interface Area {
+    id: number;
+    building: string;
+    room: string;
+    [key: string]: unknown;
+}
+
+export type Consultation = {
+    id: number;
+    faculty_name: string;
+    student_name: string;
+    area: {
+        building: string;
+        room: string;
+    };
+    duration: number;
+    date: string;
+    start_time: string;
+    reason: string;
+    status: 'pending' | 'approved' | 'declined';
+    student_id?: number;
+    faculty_id?: number;
+    created_at: string;
+    updated_at: string;
+};
