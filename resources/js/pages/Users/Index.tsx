@@ -67,7 +67,7 @@ export default function Index() {
                     <Table className="w-full text-sm">
                         <TableHeader>
                             <TableRow>
-                                <TableHead>Id</TableHead>
+                                <TableHead>ID</TableHead>
                                 <TableHead>Name</TableHead>
                                 <TableHead>Email</TableHead>
                                 <TableHead>Status</TableHead>

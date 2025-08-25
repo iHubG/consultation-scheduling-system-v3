@@ -20,9 +20,10 @@ type Area = {
 type PageProps = {
     faculty: Faculty[];
     areas: Area[];
+    role: string;
 };
 
-export default function Create({ faculty, areas }: PageProps) {
+export default function Create({ faculty, areas, role }: PageProps) {
     const form = useForm({
         faculty_id: '',
         consultation_area_id: '',
@@ -37,12 +38,18 @@ export default function Create({ faculty, areas }: PageProps) {
         form.post('/consultations');
     };
 
+        const breadcrumbs = role === 'student'
+        ? [
+            { title: 'Student Consultations', href: '/student/request' },
+            { title: 'Create Consultation', href: '/consultations/create' }]
+        : [
+            { title: 'Consultations', href: '/consultations' },
+            { title: 'Create Consultation', href: '/consultations/create' },
+        ];
+
     return (
         <AppLayout
-            breadcrumbs={[
-                { title: 'Consultations', href: '/consultations' },
-                { title: 'Create Consultation', href: '/consultations/create' },
-            ]}
+           breadcrumbs={breadcrumbs}
         >
             <Card className="mx-auto mt-6 w-full">
                 <CardHeader>

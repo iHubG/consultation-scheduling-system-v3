@@ -64,6 +64,18 @@ export function AppSidebar() {
             icon: ClipboardList,
             roles: 'faculty',
         },
+        {
+            title: 'Consultation Requests',
+            href: '/faculty/requests',
+            icon: ClipboardList,
+            roles: 'faculty',
+        },
+        {
+            title: 'Consultation History',
+            href: '/faculty/history',
+            icon: Clock,
+            roles: 'faculty',
+        },
 
         // Student only
         {
@@ -76,12 +88,6 @@ export function AppSidebar() {
             title: 'My Appointments',
             href: '/student/appointments',
             icon: Clock,
-            roles: 'student',
-        },
-        {
-            title: 'Faculty Directory',
-            href: '/faculty',
-            icon: User,
             roles: 'student',
         },
     ];

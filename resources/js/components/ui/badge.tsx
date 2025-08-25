@@ -19,6 +19,8 @@ const badgeVariants = cva(
           "text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
         active:
           "border-transparent bg-green-600 text-white [a&]:hover:bg-green-600/90",
+          blue:
+          "border-transparent bg-blue-600 text-white [a&]:hover:bg-blue-600/90",
         admin: 'bg-red-100 text-red-800',
         faculty: 'bg-blue-100 text-blue-800',
         student: 'bg-green-100 text-green-800',

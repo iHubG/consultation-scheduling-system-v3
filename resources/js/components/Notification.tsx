@@ -5,7 +5,6 @@ import {
   DropdownMenuContent,
   DropdownMenuLabel,
   DropdownMenuItem,
-  DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { Bell } from 'lucide-react';
 import { usePage } from '@inertiajs/react';
@@ -87,10 +86,7 @@ export function Notification() {
                 <span className="text-xs text-muted-foreground">{time}</span>
               </DropdownMenuItem>
             ))}
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-center text-indigo-600 cursor-pointer hover:underline">
-              See all notifications
-            </DropdownMenuItem>
+            
           </>
         )}
       </DropdownMenuContent>

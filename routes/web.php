@@ -9,6 +9,7 @@ use App\Http\Controllers\ConsultationAreasController;
 use App\Http\Controllers\RolesPermissionsController;
 use App\Http\Controllers\ConsultationsController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\FacultyController;
 
 Route::get('/', function () {
     return Inertia::render('welcome');
@@ -26,11 +27,20 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/consultations/{consultation}/approve', [ConsultationsController::class, 'approve'])->name('consultations.approve');
     Route::post('/consultations/{consultation}/decline', [ConsultationsController::class, 'decline'])->name('consultations.decline');
     Route::post('/consultations/{consultation}/request', [ConsultationsController::class, 'requestToJoin'])->middleware('auth');
+    Route::post('/consultations/{consultation}/complete', [ConsultationsController::class, 'complete'])
+        ->middleware(['auth'])
+        ->name('consultations.complete');
 
     Route::middleware(['auth', 'role:student'])->group(function () {
         Route::get('/student/request', [StudentController::class, 'index'])->name('student.request');
         Route::post('/consultations/{consultation}/request-to-join', [StudentController::class, 'requestToJoin'])->name('consultations.requestToJoin');
-         Route::get('/student/appointments', [StudentController::class, 'appointments'])->name('student.appointments');
+        Route::get('/student/appointments', [StudentController::class, 'appointments'])->name('student.appointments');
+    });
+
+    Route::middleware(['auth', 'role:faculty'])->group(function () {
+        Route::get('/faculty/consultations', [FacultyController::class, 'index'])->name('faculty.consultations.index');
+        Route::get('/faculty/requests', [FacultyController::class, 'requests'])->name('faculty.requests');
+        Route::get('/faculty/history', [FacultyController::class, 'history'])->name('faculty.history');
     });
 });
 

@@ -12,7 +12,7 @@ import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
 
-const breadcrumbs: BreadcrumbItem[] = [{ title: 'Consultations', href: '/consultations' }];
+const breadcrumbs: BreadcrumbItem[] = [{ title: 'Faculty Consultations', href: '/faculty/consultations' }];
 
 type PageProps = {
     consultations: Paginated<Consultation>;
@@ -36,7 +36,7 @@ const formatTime = (time24: string) =>
         hour12: true,
     });
 
-export default function Index() {
+export default function Consultations() {
     const { flash, consultations } = usePage<PageProps>().props;
     const { can } = useCan();
     const cellClass = 'align-center break-words whitespace-normal max-w-xs min-h-[3.5rem] ';
@@ -79,7 +79,7 @@ export default function Index() {
                         <Table className="w-full text-sm">
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead>ID</TableHead>
+                                    <TableHead>#</TableHead>
                                     <TableHead>Faculty</TableHead>
                                     <TableHead>Student</TableHead>
                                     <TableHead>Area</TableHead>
@@ -96,8 +96,9 @@ export default function Index() {
                                 {consultations.data.map((consultation, index) => (
                                     <TableRow key={consultation.id}>
                                         <TableCell className={cellClass}>
-                                             {(consultations.current_page - 1) * consultations.per_page + index + 1}
+                                            {(consultations.current_page - 1) * consultations.per_page + index + 1}
                                         </TableCell>
+
                                         <TableCell className={cellClass}>{consultation.faculty_name}</TableCell>
                                         <TableCell className={cellClass}>{consultation.student_name ?? 'No Student Assigned Yet'}</TableCell>
                                         <TableCell className={cellClass}>
@@ -145,24 +146,6 @@ export default function Index() {
                                                     >
                                                         <Trash2 className="h-4 w-4" />
                                                     </Button>
-                                                )}
-                                                {can('consultation.approve') && consultation.status === 'pending' && (
-                                                    <>
-                                                        <Button
-                                                            size="sm"
-                                                            variant="default"
-                                                            onClick={() => router.post(`/consultations/${consultation.id}/approve`)}
-                                                        >
-                                                            Approve
-                                                        </Button>
-                                                        <Button
-                                                            size="sm"
-                                                            variant="destructive"
-                                                            onClick={() => router.post(`/consultations/${consultation.id}/decline`)}
-                                                        >
-                                                            Decline
-                                                        </Button>
-                                                    </>
                                                 )}
                                             </div>
                                         </TableCell>

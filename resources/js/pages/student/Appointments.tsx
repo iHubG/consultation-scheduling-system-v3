@@ -1,14 +1,12 @@
-import { Head, usePage } from '@inertiajs/react';
+import Pagination from '@/components/Pagination';
+import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import Pagination from '@/components/Pagination';
 import AppLayout from '@/layouts/app-layout';
-import { Badge } from '@/components/ui/badge';
 import { type BreadcrumbItem, type Consultation, type Paginated } from '@/types';
+import { Head, usePage } from '@inertiajs/react';
 
-const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'My Appointments', href: '/student/appointments' },
-];
+const breadcrumbs: BreadcrumbItem[] = [{ title: 'My Appointments', href: '/student/appointments' }];
 
 type PageProps = {
     consultations: Paginated<Consultation>;
@@ -70,15 +68,19 @@ export default function Appointments() {
                                         <TableCell>{formatDate(consultation.date)}</TableCell>
                                         <TableCell>{formatTime(consultation.start_time)}</TableCell>
                                         <TableCell>{consultation.duration} mins</TableCell>
-                                        <TableCell className="whitespace-normal break-words text-muted-foreground">{consultation.reason}</TableCell>
+                                        <TableCell className="break-words whitespace-normal text-muted-foreground">{consultation.reason}</TableCell>
                                         <TableCell>
-                                            <Badge variant={
-                                                consultation.status === 'approved'
-                                                    ? 'active'
-                                                    : consultation.status === 'declined'
-                                                    ? 'destructive'
-                                                    : 'secondary'
-                                            }>
+                                            <Badge
+                                                variant={
+                                                    consultation.status === 'approved'
+                                                        ? 'active'
+                                                        : consultation.status === 'declined'
+                                                          ? 'destructive'
+                                                          : consultation.status === 'completed'
+                                                            ? 'active'
+                                                            : 'secondary'
+                                                }
+                                            >
                                                 {consultation.status}
                                             </Badge>
                                         </TableCell>
@@ -88,9 +90,7 @@ export default function Appointments() {
                         </TableBody>
                     </Table>
 
-                    <div className="mt-6">
-                        {consultations && <Pagination data={consultations} />}
-                    </div>
+                    <div className="mt-6">{consultations && <Pagination data={consultations} />}</div>
                 </CardContent>
             </Card>
         </AppLayout>

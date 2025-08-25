@@ -126,7 +126,7 @@ export type Consultation = {
     date: string;
     start_time: string;
     reason: string;
-    status: 'pending' | 'approved' | 'declined';
+    status: 'pending' | 'approved' | 'declined' | 'completed';
     student_id?: number;
     faculty_id?: number;
     created_at: string;

@@ -49,16 +49,16 @@ export default function StudentDashboard() {
                     </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="flex flex-col justify-between">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                             <Users className="h-5 w-5 text-green-500" />
-                            Browse Faculty & Areas
+                            Browse Consultation Areas
                         </CardTitle>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="">
                         <p className="mb-4 text-sm text-gray-500 dark:text-gray-400">
-                            Explore faculty members and their consultation specialties.
+                            Explore available consultation areas.
                         </p>
                         <Link href="/consultation-areas">
                             <Button className="w-full" variant="outline">Explore</Button>

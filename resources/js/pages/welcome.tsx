@@ -40,7 +40,7 @@ export default function Welcome() {
                                     </li>
                                     <li className="flex items-start gap-2">
                                         <span className="mt-1 h-2 w-2 rounded-full bg-[#f53003] dark:bg-[#FF4433]"></span>
-                                        <span>Email notifications and appointment tracking.</span>
+                                        <span>Notifications and appointment tracking.</span>
                                     </li>
                                 </ul>
                             </div>

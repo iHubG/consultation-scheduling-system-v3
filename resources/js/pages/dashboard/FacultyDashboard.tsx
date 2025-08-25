@@ -26,7 +26,7 @@ export default function FacultyDashboard() {
                         <p className="mb-4 text-sm text-gray-500 dark:text-gray-400">
                             Set your available consultation slots.
                         </p>
-                        <Link href="/faculty/schedule">
+                        <Link href="/faculty/consultations">
                             <Button className="w-full">Set Schedule</Button>
                         </Link>
                     </CardContent>

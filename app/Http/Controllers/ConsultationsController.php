@@ -14,18 +14,13 @@ class ConsultationsController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
+        $role = $user->getRoleNames()->first();
         $sort = $request->query('sort');
 
         $query = Consultation::with(['area', 'student', 'faculty']);
 
-        // Filter by student
-        if ($user->hasRole('student')) {
-            $query->where('student_id', $user->id);
-        }
-
-        // Optional filter: area
-        if ($request->filled('area_id')) {
-            $query->where('consultation_area_id', $request->area_id);
+        if ($role === 'faculty') {
+            $query->where('faculty_id', $user->id);
         }
 
         switch ($sort) {
@@ -40,27 +35,35 @@ class ConsultationsController extends Controller
                 break;
         }
 
-        return Inertia::render('consultations/Index', [
-            'consultations' => $query->paginate(10)->through(fn($consultation) => [
-                'id' => $consultation->id,
-                'date' => $consultation->date,
-                'start_time' => $consultation->start_time,
-                'duration' => $consultation->duration,
-                'reason' => $consultation->reason,
-                'status' => $consultation->status,
-                'area' => [
-                    'building' => $consultation->area->building,
-                    'room' => $consultation->area->room,
-                ],
-                'faculty_name' => $consultation->faculty?->name,
-                'student_name' => $consultation->student?->name,
-            ])->withQueryString(),
+        $consultations = $query->paginate(10)->through(fn($consultation) => [
+            'id' => $consultation->id,
+            'date' => $consultation->date,
+            'start_time' => $consultation->start_time,
+            'duration' => $consultation->duration,
+            'reason' => $consultation->reason,
+            'status' => $consultation->status,
+            'area' => [
+                'building' => $consultation->area->building,
+                'room' => $consultation->area->room,
+            ],
+            'faculty_name' => $consultation->faculty?->name,
+            'student_name' => $consultation->student?->name,
+        ])->withQueryString();
 
+        $view = match ($role) {
+            'faculty' => 'faculty/Consultations',
+            'admin' => 'consultations/Index',
+            default => abort(403, 'Unauthorized'),
+        };
+
+        return Inertia::render($view, [
+            'consultations' => $consultations,
             'filters' => [
                 'sort' => $sort,
             ],
         ]);
     }
+
 
 
     public function create()
@@ -70,9 +73,12 @@ class ConsultationsController extends Controller
             $q->where('name', 'faculty');
         })->get(['id', 'name']);
 
+        $role = Auth::user()->getRoleNames()->first();
+
         return Inertia::render('consultations/Create', [
             'areas' => $areas,
             'faculty' => $faculty,
+            'role' => $role,
         ]);
     }
 
@@ -96,6 +102,12 @@ class ConsultationsController extends Controller
             'reason' => $request->reason,
             'status' => 'pending',
         ]);
+
+        $role = Auth::user()->getRoleNames()->first();
+
+        if ($role === 'student') {
+            return redirect()->route('student.request')->with('success', 'Consultation request added.');
+        }
 
         return redirect()->route('consultations.index')->with('success', 'Consultation request submitted.');
     }
@@ -166,12 +178,23 @@ class ConsultationsController extends Controller
         if ($user->hasRole('student') && is_null($consultation->student_id) && $consultation->status === 'pending') {
             $consultation->update([
                 'student_id' => $user->id,
-                'status' => 'pending', 
+                'status' => 'pending',
             ]);
 
             return redirect()->back()->with('success', 'Requested consultation successfully.');
         }
 
         return redirect()->back()->with('error', 'Unable to request consultation.');
+    }
+
+    public function complete(Consultation $consultation)
+    {
+        if ($consultation->status !== 'approved') {
+            return back()->with('error', 'Only approved consultations can be marked as completed.');
+        }
+
+        $consultation->update(['status' => 'completed']);
+
+        return back()->with('success', 'Consultation marked as completed.');
     }
 }
