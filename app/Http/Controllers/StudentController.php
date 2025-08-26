@@ -7,6 +7,8 @@ use App\Models\ConsultationArea;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\ConsultationRequest;
 
 class StudentController extends Controller
 {
@@ -17,19 +19,14 @@ class StudentController extends Controller
     {
         $user = Auth::user();
 
-        // Fetch consultations that are:
-        // - status 'pending'
-        // - student_id is null (no student assigned yet)
         $query = Consultation::with('area', 'faculty')
             ->where('status', 'pending')
             ->whereNull('student_id');
 
-        // Optional: filter by area
         if ($request->filled('area_id')) {
             $query->where('consultation_area_id', $request->input('area_id'));
         }
 
-        // Optional: sort (latest/oldest)
         $sort = $request->query('sort', 'latest');
         if ($sort === 'oldest') {
             $query->orderBy('created_at', 'asc');
@@ -41,7 +38,7 @@ class StudentController extends Controller
             return [
                 'id' => $consultation->id,
                 'faculty_name' => $consultation->faculty->name ?? 'N/A',
-                'student_name' => null, // explicitly null since student_id is null here
+                'student_name' => null, 
                 'area' => [
                     'building' => $consultation->area->building ?? 'N/A',
                     'room' => $consultation->area->room ?? 'N/A',
@@ -87,46 +84,50 @@ class StudentController extends Controller
             return redirect()->back()->with('error', 'You can only request consultations that are pending.');
         }
 
-        // Assign the student to the consultation
         $consultation->update([
             'student_id' => $user->id,
         ]);
+
+        $faculty = $consultation->faculty;
+
+        if ($faculty) {
+            Notification::send($faculty, new ConsultationRequest($user));
+        }
 
         return redirect()->back()->with('success', 'Consultation request submitted successfully.');
     }
 
     public function appointments(Request $request)
-{
-    $user = Auth::user();
+    {
+        $user = Auth::user();
 
-    // Fetch consultations assigned to this student
-    $query = Consultation::with('area', 'faculty')
-        ->where('student_id', $user->id)
-        ->orderBy('date', 'desc')
-        ->orderBy('start_time', 'desc');
+        // Fetch consultations assigned to this student
+        $query = Consultation::with('area', 'faculty')
+            ->where('student_id', $user->id)
+            ->orderBy('date', 'desc')
+            ->orderBy('start_time', 'desc');
 
-    // Optional filtering and sorting can be added here if needed
+        // Optional filtering and sorting can be added here if needed
 
-    $consultations = $query->paginate(10)->through(function ($consultation) {
-        return [
-            'id' => $consultation->id,
-            'faculty_name' => $consultation->faculty->name ?? 'N/A',
-            'area' => [
-                'building' => $consultation->area->building ?? 'N/A',
-                'room' => $consultation->area->room ?? 'N/A',
-            ],
-            'date' => $consultation->date,
-            'start_time' => $consultation->start_time,
-            'duration' => $consultation->duration,
-            'reason' => $consultation->reason,
-            'status' => $consultation->status,
-        ];
-    });
+        $consultations = $query->paginate(10)->through(function ($consultation) {
+            return [
+                'id' => $consultation->id,
+                'faculty_name' => $consultation->faculty->name ?? 'N/A',
+                'area' => [
+                    'building' => $consultation->area->building ?? 'N/A',
+                    'room' => $consultation->area->room ?? 'N/A',
+                ],
+                'date' => $consultation->date,
+                'start_time' => $consultation->start_time,
+                'duration' => $consultation->duration,
+                'reason' => $consultation->reason,
+                'status' => $consultation->status,
+            ];
+        });
 
-    return Inertia::render('student/Appointments', [
-        'consultations' => $consultations,
-        'authUserRole' => $user->roles->pluck('name')->first() ?? 'student',
-    ]);
-}
-
+        return Inertia::render('student/Appointments', [
+            'consultations' => $consultations,
+            'authUserRole' => $user->roles->pluck('name')->first() ?? 'student',
+        ]);
+    }
 }

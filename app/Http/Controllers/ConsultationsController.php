@@ -8,6 +8,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\ConsultationApproved;
 
 class ConsultationsController extends Controller
 {
@@ -159,6 +161,13 @@ class ConsultationsController extends Controller
             'status' => 'approved',
         ]);
 
+        $student = $consultation->student;
+
+        if ($student) {
+            $faculty = Auth::user();
+            Notification::send($student, new ConsultationApproved($faculty));
+        }
+
         return redirect()->back()->with('success', 'Consultation approved.');
     }
 
@@ -171,21 +180,33 @@ class ConsultationsController extends Controller
         return redirect()->back()->with('success', 'Consultation declined.');
     }
 
-    public function requestToJoin(Consultation $consultation)
-    {
-        $user = Auth::user();
 
-        if ($user->hasRole('student') && is_null($consultation->student_id) && $consultation->status === 'pending') {
-            $consultation->update([
-                'student_id' => $user->id,
-                'status' => 'pending',
-            ]);
+    // public function requestToJoin(Consultation $consultation)
+    // {
+    //     $user = Auth::user();
 
-            return redirect()->back()->with('success', 'Requested consultation successfully.');
-        }
+    //     if (
+    //         $user->hasRole('student') &&
+    //         is_null($consultation->student_id) &&
+    //         $consultation->status === 'pending'
+    //     ) {
+    //         $consultation->update([
+    //             'student_id' => $user->id,
+    //             'status' => 'pending',
+    //         ]);
 
-        return redirect()->back()->with('error', 'Unable to request consultation.');
-    }
+    //         $faculty = $consultation->faculty;
+
+    //         if ($faculty) {
+    //             Notification::send($faculty, new ConsultationRequest($user));
+    //         }
+
+    //         return redirect()->back()->with('success', 'Requested consultation successfully.');
+    //     }
+
+    //     return redirect()->back()->with('error', 'Unable to request consultation.');
+    // }
+
 
     public function complete(Consultation $consultation)
     {

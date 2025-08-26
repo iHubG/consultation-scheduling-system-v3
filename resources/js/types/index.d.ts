@@ -37,6 +37,7 @@ export interface SharedData {
     systemStats?: SystemStats;
     filters?: Filters; 
     recentActivity?: ActivityItem[];
+    notifications: Notification[]; 
     [key: string]: unknown;
 }
 
@@ -132,3 +133,11 @@ export type Consultation = {
     created_at: string;
     updated_at: string;
 };
+
+export interface Notification {
+  id: string;
+  title: string;
+  description?: string;
+  time: string;
+  link?: string;
+}

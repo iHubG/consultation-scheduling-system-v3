@@ -26,7 +26,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('consultations', ConsultationsController::class);
     Route::post('/consultations/{consultation}/approve', [ConsultationsController::class, 'approve'])->name('consultations.approve');
     Route::post('/consultations/{consultation}/decline', [ConsultationsController::class, 'decline'])->name('consultations.decline');
-    Route::post('/consultations/{consultation}/request', [ConsultationsController::class, 'requestToJoin'])->middleware('auth');
+    // Route::post('/consultations/{consultation}/request', [ConsultationsController::class, 'requestToJoin'])->middleware('auth');
     Route::post('/consultations/{consultation}/complete', [ConsultationsController::class, 'complete'])
         ->middleware(['auth'])
         ->name('consultations.complete');
